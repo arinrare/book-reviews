@@ -1,15 +1,24 @@
+
 # Book Reviews Site in Laravel
 
-## Local Address Details:
+## Local Address Details
 
+URL:
+```
 http://book-reviews/hello
+```
 
-- Windows Hosts File:
-- ```# Added for laravel XAMPP app book-reviews
-127.0.0.1   book-reviews```
+### Windows Hosts File
 
-- XAMPP Apache VHOSTS File (E:\xampp\apache\conf\extra\httpd-vhosts.conf)
-```<VirtualHost *:80>
+```text
+# Added for laravel XAMPP app book-reviews
+127.0.0.1   book-reviews
+```
+
+### XAMPP Apache VHOSTS File (E:/xampp/apache/conf/extra/httpd-vhosts.conf)
+
+```apache
+<VirtualHost *:80>
     ServerName localhost
     DocumentRoot "C:/xampp/htdocs"
     <Directory "C:/xampp/htdocs">
@@ -28,4 +37,5 @@ http://book-reviews/hello
         AllowOverride All
         Require all granted
     </Directory>
-</VirtualHost>```
+</VirtualHost>
+```

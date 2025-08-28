@@ -9,9 +9,12 @@ use Illuminate\View\Component;
 
 class Navbar extends Component
 {
-    public string $landing = 'https://michaelbaggott.site';
+    /*public string $landing = 'https://michaelbaggott.site';
     public string $home = 'https://michaelbaggott.site/bookreviews';
-    public string $reviews = 'https://michaelbaggott.site/bookreviews/reviews';
+    public string $reviews = 'https://michaelbaggott.site/bookreviews/reviews';*/
+    public string $landing = 'https://michaelbaggott.site';
+    public string $home = 'http://book-reviews';
+    public string $reviews = 'http://book-reviews/reviews';
 
     /**
      * Create a new component instance.

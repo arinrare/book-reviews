@@ -39,3 +39,9 @@ http://book-reviews/hello
     </Directory>
 </VirtualHost>
 ```
+
+## To Run
+
+- Run Vite in the terminal for Tailiwnd ```npm run dev'''
+- Launch XAMPP and start Apache server
+

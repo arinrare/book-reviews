@@ -30,6 +30,7 @@ class ReviewsController extends Controller
             // Extract embedded novel author, genres, series, publisher names, and cover image
             foreach ($reviews as &$review) {
                 // Novel author(s) from _embedded
+                $novelAuthors = [];
                 if (isset($review['_embedded']['wp:term'])) {
                     foreach ($review['_embedded']['wp:term'] as $termGroup) {
                         foreach ($termGroup as $term) {

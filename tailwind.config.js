@@ -12,4 +12,7 @@ module.exports = {
     },
   },
   plugins: [],
+  safelist: [
+    'perspective', 'preserve-3d', 'backface-hidden', 'rotate-y-180'
+  ],
 }

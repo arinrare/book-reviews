@@ -9,19 +9,20 @@ use Illuminate\View\Component;
 
 class Navbar extends Component
 {
-    /*public string $landing = 'https://michaelbaggott.site';
-    public string $home = 'https://michaelbaggott.site/bookreviews';
-    public string $reviews = 'https://michaelbaggott.site/bookreviews/reviews';*/
-    public string $landing = 'https://michaelbaggott.site';
-    public string $home = 'http://book-reviews';
-    public string $reviews = 'http://book-reviews/reviews';
+    public $landing;
+    public $home;
+    public $reviews;
 
     /**
      * Create a new component instance.
-     */
+     */ 
     public function __construct()
     {
-        // No need to set anything here if you use property defaults
+        $host_url = config('bookreviews.host_url');
+        $landing_url=config('bookreviews.landing_url');
+        $this->landing = $landing_url;
+        $this->home = $host_url;
+        $this->reviews = $host_url . '/reviews';
     }
 
     /**

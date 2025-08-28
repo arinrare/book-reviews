@@ -15,9 +15,9 @@ class ReviewsController extends Controller
         $page = max(1, (int) $request->query('page', 1));
         $perPage = 10;
         $cacheKey = 'reviews_page_' . $page;
-        $reviews = Cache::remember($cacheKey, 300, function () use ($page, $perPage) {
+        $reviews = Cache::remember($cacheKey, config('bookreviews.cache_time'), function () use ($page, $perPage) {
             \Log::info('Fetching reviews from API...');
-            $response = Http::get('https://michaelbaggott.site/bookreviews/wp-json/wp/v2/rcno/reviews', [
+            $response = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
                 'per_page' => $perPage,
                 'page' => $page,
                 '_embed' => 1,
@@ -84,7 +84,7 @@ class ReviewsController extends Controller
                 if (!$coverUrl && isset($review['id'])) {
                     $mediaCacheKey = 'review_' . $review['id'] . '_first_attachment';
                     $coverUrl = Cache::remember($mediaCacheKey, 300, function () use ($review) {
-                        $mediaResp = Http::get('https://michaelbaggott.site/bookreviews/wp-json/wp/v2/media', [
+                        $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
                             'parent' => $review['id'],
                             'per_page' => 1
                         ]);
@@ -103,7 +103,7 @@ class ReviewsController extends Controller
                     $seriesId = $review['rcno/series'][0];
                     $seriesCacheKey = 'series_' . $seriesId . '_first_book_cover';
                     $coverUrl = Cache::remember($seriesCacheKey, 300, function () use ($seriesId, $review) {
-                        $seriesReviewsResp = Http::get('https://michaelbaggott.site/bookreviews/wp-json/wp/v2/rcno/reviews', [
+                        $seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
                             'rcno/series' => $seriesId,
                             'per_page' => 1,
                             'orderby' => 'date',
@@ -117,7 +117,7 @@ class ReviewsController extends Controller
                                 return $firstSeriesReview['_embedded']['wp:featuredmedia'][0]['source_url'];
                             } else {
                                 // Try first attachment
-                                $mediaResp = Http::get('https://michaelbaggott.site/bookreviews/wp-json/wp/v2/media', [
+                                $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
                                     'parent' => $firstSeriesReview['id'],
                                     'per_page' => 1
                                 ]);
@@ -140,7 +140,7 @@ class ReviewsController extends Controller
 
         $countCacheKey = 'reviews_total_count';
         $totalReviews = Cache::remember($countCacheKey, 60, function () {
-            $resp = Http::get('https://michaelbaggott.site/bookreviews/wp-json/wp/v2/rcno/reviews', [
+            $resp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
                 'per_page' => 1,
                 'page' => 1,
             ]);

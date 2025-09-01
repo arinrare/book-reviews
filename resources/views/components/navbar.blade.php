@@ -6,6 +6,7 @@
                 <a href="{{ $landing }}" class="w-4/5 md:w-auto px-8 md:px-20 py-2 border border-gray-100 text-gray-100 rounded hover:bg-neutral-700 transition text-center">Landing</a>
                 <a href="{{ $home }}" class="w-4/5 md:w-auto px-8 md:px-20 py-2 border border-gray-100 text-gray-100 rounded hover:bg-neutral-700 transition text-center">Home</a>
                 <a href="{{ $reviews }}" class="w-4/5 md:w-auto px-8 md:px-20 py-2 border border-gray-100 text-gray-100 rounded hover:bg-neutral-700 transition text-center">Reviews</a>
+                <a href="{{ $categories }}" class="w-4/5 md:w-auto px-8 md:px-20 py-2 border border-gray-100 text-gray-100 rounded hover:bg-neutral-700 transition text-center">Categories</a>
             </div>
         </div>
     </nav>

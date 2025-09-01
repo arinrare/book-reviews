@@ -12,6 +12,7 @@ class Navbar extends Component
     public $landing;
     public $home;
     public $reviews;
+    public $categories;
 
     /**
      * Create a new component instance.
@@ -23,6 +24,7 @@ class Navbar extends Component
         $this->landing = $landing_url;
         $this->home = $host_url;
         $this->reviews = $host_url . '/reviews';
+        $this->categories = $host_url . '/categories';
     }
 
     /**

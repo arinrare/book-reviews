@@ -14,9 +14,9 @@ class ReviewsController extends Controller
         $title = "Book Reviews";
         $page = max(1, (int) $request->query('page', 1));
         $perPage = 10;
+        $cacheTime = config('bookreviews.cache_time', 300); // default 5 min if not set
         $cacheKey = 'reviews_page_' . $page;
-        $reviews = Cache::remember($cacheKey, config('bookreviews.cache_time'), function () use ($page, $perPage) {
-            \Log::info('Fetching reviews from API...');
+        $reviews = Cache::remember($cacheKey, $cacheTime, function () use ($page, $perPage) {
             $response = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
                 'per_page' => $perPage,
                 'page' => $page,

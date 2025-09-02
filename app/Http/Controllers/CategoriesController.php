@@ -17,24 +17,32 @@ class CategoriesController extends Controller
         $apiBase = config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/';
 
 
-        $authors = Cache::remember($cacheKey, $cacheTime, function () use ($apiBase) {
-            $resp = Http::get($apiBase . 'authors');
-            return $resp->ok() ? $resp->json() : [];
+        $fetchAll = function($endpoint) use ($apiBase) {
+            $all = [];
+            $page = 1;
+            do {
+                $resp = Http::get($apiBase . $endpoint, ['per_page' => 100, 'page' => $page]);
+                $data = $resp->ok() ? $resp->json() : [];
+                $all = array_merge($all, $data);
+                $page++;
+            } while (is_array($data) && count($data) === 100);
+            return $all;
+        };
+
+        $authors = Cache::remember($cacheKey, $cacheTime, function () use ($fetchAll) {
+            return $fetchAll('authors');
         });
 
-        $publishers = Cache::remember('categories_publishers', $cacheTime, function () use ($apiBase) {
-            $resp = Http::get($apiBase . 'publishers');
-            return $resp->ok() ? $resp->json() : [];
+        $publishers = Cache::remember('categories_publishers', $cacheTime, function () use ($fetchAll) {
+            return $fetchAll('publishers');
         });
 
-        $series = Cache::remember('categories_series', $cacheTime, function () use ($apiBase) {
-            $resp = Http::get($apiBase . 'series');
-            return $resp->ok() ? $resp->json() : [];
+        $series = Cache::remember('categories_series', $cacheTime, function () use ($fetchAll) {
+            return $fetchAll('series');
         });
 
-        $genres = Cache::remember('categories_genres', $cacheTime, function () use ($apiBase) {
-            $resp = Http::get($apiBase . 'genres');
-            return $resp->ok() ? $resp->json() : [];
+        $genres = Cache::remember('categories_genres', $cacheTime, function () use ($fetchAll) {
+            return $fetchAll('genres');
         });
 
         return view('categories_index', [

@@ -51,22 +51,28 @@
                                     style="background: transparent;"
                                     class="object-contain w-full h-full max-h-60 rounded"
                                     loading="lazy">
-                                <!-- Click/Touch to flip: only on image area -->
-                                <button @click="flipped = !flipped" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" aria-label="Flip card"></button>
+                                <!-- Click/Touch to flip: only on image area, only when not flipped -->
+                                <button x-show="!flipped" @click="flipped = true" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" aria-label="Flip card"></button>
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-white">No Cover</div>
                             @endif
                         </div>
                     </div>
                     <!-- Back: Book Details -->
-                    <div class="absolute inset-0 backface-hidden rotate-y-180 flex flex-col items-center justify-center bg-neutral-800/95 text-gray-100 rounded-lg shadow-lg p-4">
+                    <div class="absolute inset-0 backface-hidden rotate-y-180 flex flex-col items-center justify-center bg-neutral-800/95 text-gray-100 rounded-lg shadow-lg p-4 h-full w-full" style="position: relative; min-height: 100%; min-width: 100%;">
+                        <!-- Back button -->
+                        <button @click="flipped = false" class="absolute top-2 left-2 z-20 bg-neutral-700 hover:bg-neutral-600 text-white rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Flip back">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
                         <div class="text-sm font-semibold mb-1 text-center">{!! html_entity_decode($review['title']['rendered']) !!}</div>
                         <div class="text-xs mb-1"><strong>Review Date:</strong> {{ \Carbon\Carbon::parse($review['date'])->format('M d, Y') }}</div>
                         <div class="text-xs mb-1"><strong>Author:</strong> @if(!empty($review['novel_author_names'])) {{ implode(', ', $review['novel_author_names']) }} @else N/A @endif</div>
                         <div class="text-xs mb-1"><strong>Publisher:</strong> @if(!empty($review['publisher_names'])) {{ implode(', ', $review['publisher_names']) }} @else N/A @endif</div>
                         <div class="text-xs mb-1"><strong>Series:</strong> @if(!empty($review['series_names'])) {{ implode(', ', $review['series_names']) }} @else N/A @endif</div>
                         <div class="text-xs text-gray-100 mb-2 line-clamp-4">{!! \Illuminate\Support\Str::limit(strip_tags($review['content']['rendered']), 200) !!}</div>
-                        <a href="{{ $review['link'] }}" class="text-blue-600 hover:underline" target="_blank" rel="noopener">Read full review</a>
+                        <a href="{{ $review['link'] }}" class="text-gray-200 hover:text-white hover:underline focus:underline active:underline transition-colors mt-2" target="_blank" rel="noopener">Read full review</a>
                     </div>
                 </div>
             </div>

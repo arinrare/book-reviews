@@ -72,7 +72,7 @@
                         <div class="text-xs mb-1"><strong>Publisher:</strong> @if(!empty($review['publisher_names'])) {{ implode(', ', $review['publisher_names']) }} @else N/A @endif</div>
                         <div class="text-xs mb-1"><strong>Series:</strong> @if(!empty($review['series_names'])) {{ implode(', ', $review['series_names']) }} @else N/A @endif</div>
                         <div class="text-xs text-gray-100 mb-2 line-clamp-4">{!! \Illuminate\Support\Str::limit(strip_tags($review['content']['rendered']), 200) !!}</div>
-                        <a href="{{ $review['link'] }}" class="text-gray-200 hover:text-white hover:underline focus:underline active:underline transition-colors mt-2" target="_blank" rel="noopener">Read full review</a>
+                        <a href="{{ url('/review/' . ($review['slug'] ?? '')) }}" class="text-gray-200 hover:text-white hover:underline focus:underline active:underline transition-colors mt-2">Read full review</a>
                     </div>
                 </div>
             </div>

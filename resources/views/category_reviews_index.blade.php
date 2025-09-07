@@ -15,7 +15,7 @@
                 <div class="bg-neutral-800/80 rounded-lg shadow-lg p-4 flex flex-col">
                     <div class="text-base font-bold mb-2 text-center">{!! html_entity_decode($review['title']['rendered']) !!}</div>
                     <div class="text-xs text-gray-100 mb-2 line-clamp-4">{!! \Illuminate\Support\Str::limit(strip_tags($review['content']['rendered']), 200) !!}</div>
-                    <a href="{{ $review['link'] }}" class="text-gray-100 hover:text-white hover:underline text-center transition-colors" target="_blank" rel="noopener">Read full review</a>
+                    <a href="{{ url('/review/' . ($review['slug'] ?? '')) }}" class="text-gray-100 hover:text-white hover:underline text-center transition-colors">Read full review</a>
                 </div>
             @empty
                 <div class="col-span-3 text-gray-400 text-center">No reviews found for this category.</div>

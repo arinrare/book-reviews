@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class CategoryReviewsController extends Controller
 {
-    public function show($type, $slug, Request $request)
+    public function index($type, $slug, Request $request)
     {
         $perPage = 10;
         $page = max(1, (int) $request->query('page', 1));
@@ -79,7 +79,7 @@ class CategoryReviewsController extends Controller
         $totalPages = $totalReviews > 0 ? ceil($totalReviews / $perPage) : 1;
 
         // Pass to view
-        return view('category_reviews', [
+        return view('category_reviews_index', [
             'type' => $type,
             'term' => $term,
             'reviews' => $reviews,

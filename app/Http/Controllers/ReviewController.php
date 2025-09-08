@@ -51,7 +51,7 @@ class ReviewController extends Controller
 		// Publishers
 		$review['publisher_names'] = $getNames('publishers', $review['rcno/publishers'] ?? []);
 
-		// Cover image (try featured_media, fallback to attachment)
+		// Cover image (try featured_media, fallback to attachment, then fallback to first book in series)
 		$review['cover_url'] = null;
 		if (!empty($review['featured_media'])) {
 			$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media/' . $review['featured_media']);
@@ -59,13 +59,44 @@ class ReviewController extends Controller
 				$media = $mediaResp->json();
 				$review['cover_url'] = $media['source_url'] ?? null;
 			}
-		} else {
-			// Try attachments
+		}
+		// Fallback: try attachments
+		if (empty($review['cover_url'])) {
 			$attachResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', ['parent' => $review['id']]);
 			if ($attachResp->ok()) {
 				$attachments = $attachResp->json();
 				if (!empty($attachments[0]['source_url'])) {
 					$review['cover_url'] = $attachments[0]['source_url'];
+				}
+			}
+		}
+		// Fallback: if still no cover, try to get from the first book in the same series
+		if (empty($review['cover_url']) && !empty($review['series_names']) && isset($review['rcno/series'][0])) {
+			$seriesId = $review['rcno/series'][0];
+			$seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
+				'rcno/series' => $seriesId,
+				'per_page' => 1,
+				'orderby' => 'date',
+				'order' => 'asc',
+				'_embed' => 1
+			]);
+			if ($seriesReviewsResp->ok() && is_array($seriesReviewsResp->json()) && count($seriesReviewsResp->json()) > 0) {
+				$firstSeriesReview = $seriesReviewsResp->json()[0];
+				// Try featured image
+				if (isset($firstSeriesReview['_embedded']['wp:featuredmedia'][0]['source_url'])) {
+					$review['cover_url'] = $firstSeriesReview['_embedded']['wp:featuredmedia'][0]['source_url'];
+				} else {
+					// Try first attachment
+					$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
+						'parent' => $firstSeriesReview['id'],
+						'per_page' => 1
+					]);
+					if ($mediaResp->ok() && is_array($mediaResp->json()) && count($mediaResp->json()) > 0) {
+						$media = $mediaResp->json()[0];
+						if (isset($media['source_url'])) {
+							$review['cover_url'] = $media['source_url'];
+						}
+					}
 				}
 			}
 		}

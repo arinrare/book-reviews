@@ -14,7 +14,7 @@ class CategoriesController extends Controller
         $page = max(1, (int) $request->query('page', 1));
         $cacheTime = config('bookreviews.cache_time', 300); // default 5 min if not set
         $cacheKey = 'categories_page_' . $page;
-        $apiBase = config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/';
+        $apiBase = config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/';
 
 
         $fetchAll = function($endpoint) use ($apiBase) {

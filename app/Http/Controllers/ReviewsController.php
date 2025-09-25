@@ -17,11 +17,26 @@ class ReviewsController extends Controller
         $cacheTime = config('bookreviews.cache_time', 300); // default 5 min if not set
         $cacheKey = 'reviews_page_' . $page;
         $reviews = Cache::remember($cacheKey, $cacheTime, function () use ($page, $perPage) {
-            $response = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
+            // Build API parameters - WordPress REST API sometimes behaves differently with page=1
+            $params = [
                 'per_page' => $perPage,
-                'page' => $page,
                 '_embed' => 1,
+            ];
+            
+            // Only add page parameter if it's not page 1 (some WordPress APIs don't like page=1 explicitly)
+            if ($page > 1) {
+                $params['page'] = $page;
+            }
+            
+            $response = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/reviews', $params);
+            
+            // Debug logging - remove this after fixing
+            \Log::info('API Response for page ' . $page, [
+                'status' => $response->status(),
+                'body_preview' => substr($response->body(), 0, 200),
+                'is_array' => is_array($response->json())
             ]);
+            
             $reviews = $response->json();
             if (!is_array($reviews)) {
                 $reviews = [];
@@ -84,7 +99,7 @@ class ReviewsController extends Controller
                 if (!$coverUrl && isset($review['id'])) {
                     $mediaCacheKey = 'review_' . $review['id'] . '_first_attachment';
                     $coverUrl = Cache::remember($mediaCacheKey, 300, function () use ($review) {
-                        $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
+                        $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/media', [
                             'parent' => $review['id'],
                             'per_page' => 1
                         ]);
@@ -103,7 +118,7 @@ class ReviewsController extends Controller
                     $seriesId = $review['rcno/series'][0];
                     $seriesCacheKey = 'series_' . $seriesId . '_first_book_cover';
                     $coverUrl = Cache::remember($seriesCacheKey, 300, function () use ($seriesId, $review) {
-                        $seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
+                        $seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/reviews', [
                             'rcno/series' => $seriesId,
                             'per_page' => 1,
                             'orderby' => 'date',
@@ -117,7 +132,7 @@ class ReviewsController extends Controller
                                 return $firstSeriesReview['_embedded']['wp:featuredmedia'][0]['source_url'];
                             } else {
                                 // Try first attachment
-                                $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
+                                $mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/media', [
                                     'parent' => $firstSeriesReview['id'],
                                     'per_page' => 1
                                 ]);
@@ -140,7 +155,7 @@ class ReviewsController extends Controller
 
         $countCacheKey = 'reviews_total_count';
         $totalReviews = Cache::remember($countCacheKey, 60, function () {
-            $resp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
+            $resp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/reviews', [
                 'per_page' => 1,
                 'page' => 1,
             ]);

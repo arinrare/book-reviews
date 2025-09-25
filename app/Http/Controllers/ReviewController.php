@@ -11,7 +11,7 @@ class ReviewController extends Controller
 	public function index($slug)
 	{
 		$cacheTime = config('bookreviews.cache_time', 300);
-		$apiBase = config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews';
+		$apiBase = config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/reviews';
 		$cacheKey = 'review_' . $slug;
 
 		$review = Cache::remember($cacheKey, $cacheTime, function () use ($apiBase, $slug) {
@@ -28,7 +28,7 @@ class ReviewController extends Controller
 		}
 
 		// Helper to fetch taxonomy names by ID
-		$apiBase = config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/';
+		$apiBase = config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/';
 		$getNames = function($type, $ids) use ($apiBase) {
 			if (empty($ids)) return [];
 			$names = [];
@@ -54,7 +54,7 @@ class ReviewController extends Controller
 		// Cover image (try featured_media, fallback to attachment, then fallback to first book in series)
 		$review['cover_url'] = null;
 		if (!empty($review['featured_media'])) {
-			$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media/' . $review['featured_media']);
+			$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/media/' . $review['featured_media']);
 			if ($mediaResp->ok()) {
 				$media = $mediaResp->json();
 				$review['cover_url'] = $media['source_url'] ?? null;
@@ -62,7 +62,7 @@ class ReviewController extends Controller
 		}
 		// Fallback: try attachments
 		if (empty($review['cover_url'])) {
-			$attachResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', ['parent' => $review['id']]);
+			$attachResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/media', ['parent' => $review['id']]);
 			if ($attachResp->ok()) {
 				$attachments = $attachResp->json();
 				if (!empty($attachments[0]['source_url'])) {
@@ -73,7 +73,7 @@ class ReviewController extends Controller
 		// Fallback: if still no cover, try to get from the first book in the same series
 		if (empty($review['cover_url']) && !empty($review['series_names']) && isset($review['rcno/series'][0])) {
 			$seriesId = $review['rcno/series'][0];
-			$seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/rcno/reviews', [
+			$seriesReviewsResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/rcno/reviews', [
 				'rcno/series' => $seriesId,
 				'per_page' => 1,
 				'orderby' => 'date',
@@ -87,7 +87,7 @@ class ReviewController extends Controller
 					$review['cover_url'] = $firstSeriesReview['_embedded']['wp:featuredmedia'][0]['source_url'];
 				} else {
 					// Try first attachment
-					$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews/wp-json/wp/v2/media', [
+					$mediaResp = Http::get(config('bookreviews.landing_url') . '/bookreviews-wordpress/wp-json/wp/v2/media', [
 						'parent' => $firstSeriesReview['id'],
 						'per_page' => 1
 					]);
@@ -113,7 +113,7 @@ class ReviewController extends Controller
 		}
 
 		// Scrape score results and missing book details from review page if not present in API
-		$reviewUrl = config('bookreviews.landing_url') . '/bookreviews/review/' . $slug . '/';
+		$reviewUrl = config('bookreviews.landing_url') . '/bookreviews-wordpress/review/' . $slug . '/';
 		$htmlResp = Http::get($reviewUrl);
 		if ($htmlResp->ok()) {
 			$html = $htmlResp->body();

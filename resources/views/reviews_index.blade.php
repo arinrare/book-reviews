@@ -30,9 +30,23 @@
                 <div class="relative w-full h-full transition-transform duration-500 preserve-3d group-hover:scale-105 group-focus:scale-105" :class="{ 'rotate-y-180': flipped }">
                     <div class="absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-neutral-800/80 rounded-lg shadow-lg overflow-hidden">
                         <div 
-                            class="review-title-scrollbar text-base sm:text-lg font-semibold mb-2 text-center w-full pl-3 pr-3 max-h-16 overflow-y-auto"
-                            style="word-break:break-word; pointer-events: auto;"
+                            class="review-title-scrollbar text-base sm:text-lg font-semibold mb-2 text-center w-full pl-3 pr-3 max-h-20 overflow-y-hidden"
+                            style="word-break:break-word; pointer-events: auto; line-height: 1.3;"
                             tabindex="0"
+                            x-init="
+                                const checkOverflow = () => {
+                                    setTimeout(() => {
+                                        if ($el.scrollHeight > $el.clientHeight) {
+                                            $el.style.overflowY = 'auto';
+                                        } else {
+                                            $el.style.overflowY = 'hidden';
+                                        }
+                                    }, 50);
+                                };
+                                $nextTick(checkOverflow);
+                                // Check again after fonts load
+                                document.fonts.ready.then(checkOverflow);
+                            "
                             @wheel.stop="
                                 const el = $event.currentTarget;
                                 const delta = $event.deltaY;

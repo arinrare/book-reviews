@@ -13,7 +13,7 @@ class CategoryReviewsController extends Controller
         $perPage = 10;
         $page = max(1, (int) $request->query('page', 1));
         $cacheTime = config('bookreviews.cache_time', 300);
-        $apiBase = rtrim(config('bookreviews.landing_url'), '/') . '/bookreviews/wp-json/wp/v2/';
+        $apiBase = rtrim(config('bookreviews.landing_url'), '/') . '/bookreviews-wordpress/wp-json/wp/v2/';
 
 
         // Map type to endpoints and query params
